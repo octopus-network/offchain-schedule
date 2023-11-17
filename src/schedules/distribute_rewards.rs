@@ -25,7 +25,7 @@ pub async fn distribute_lpos_market_reward() -> anyhow::Result<()> {
 
     let undistributed_consumer_chains = lpos_market
         .get_consumer_chains_undistributed_rewards(signer)
-        .await;
+        .await?;
 
     for (cc_id, count) in undistributed_consumer_chains {
         for _ in 0..count {
@@ -38,7 +38,7 @@ pub async fn distribute_lpos_market_reward() -> anyhow::Result<()> {
 
     let undistributed_validators = lpos_market
         .get_validators_undistributed_rewards(signer)
-        .await;
+        .await?;
 
     for (validator_id, count) in undistributed_validators {
         for _ in 0..count {

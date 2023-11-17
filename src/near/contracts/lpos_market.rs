@@ -1,5 +1,5 @@
 use crate::{cmd_args::NearNetwork, *};
-use anyhow::anyhow;
+use anyhow::{anyhow, Ok};
 use near_workspaces::{result::ExecutionFinalResult, Account, AccountId};
 use serde_json::json;
 
@@ -74,7 +74,7 @@ impl LposMarket {
             .await?
             .json()?;
 
-        tracing::info!("get_undistributed_rewards_count,  count: {}", result);
+        tracing::info!("get_undistributed_rewards_count, count: {}", result);
 
         Ok(result)
     }
@@ -82,27 +82,32 @@ impl LposMarket {
     pub async fn get_consumer_chains_undistributed_rewards(
         &self,
         signer: &Account,
-    ) -> Vec<(ConsumerChainId, u32)> {
-        signer
+    ) -> anyhow::Result<Vec<(ConsumerChainId, u32)>> {
+        let result: Vec<(ConsumerChainId, u32)> = signer
             .view(
                 &self.contract_id,
                 "get_consumer_chains_undistributed_rewards",
             )
-            .await
-            .unwrap()
-            .json()
-            .unwrap()
+            .await?
+            .json()?;
+        tracing::info!(
+            "get_consumer_chains_undistributed_rewards, result: {:?}",
+            result
+        );
+        Ok(result)
     }
 
     pub async fn get_validators_undistributed_rewards(
         &self,
         signer: &Account,
-    ) -> Vec<(AccountId, u32)> {
-        signer
+    ) -> anyhow::Result<Vec<(AccountId, u32)>> {
+        let result: Vec<(AccountId, u32)> = signer
             .view(&self.contract_id, "get_validators_undistributed_rewards")
-            .await
-            .unwrap()
-            .json()
-            .unwrap()
+            .await?
+            .json()?;
+
+        tracing::info!("get_validators_undistributed_rewards, result: {:?}", result);
+
+        Ok(result)
     }
 }
