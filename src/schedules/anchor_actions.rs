@@ -14,6 +14,7 @@ use crate::{
 pub async fn fetch_validator_set_from_restaking_base_and_send_vsc_packet_to_appchain_in_anchors(
 ) -> anyhow::Result<()> {
     let appchain_anchor_ibc_list = get_all_anchor_ibc().await?;
+    tracing::info!("All anchor ibc list: {:?}", appchain_anchor_ibc_list);
     let signer = SIGNER.get().ok_or(anyhow!("Failed to get signer"))?;
     for appchain_anchor_ibc in appchain_anchor_ibc_list {
         appchain_anchor_ibc

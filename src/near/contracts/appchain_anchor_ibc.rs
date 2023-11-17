@@ -8,7 +8,7 @@ pub trait AppchainAnchorIbc: NearContract {
         &self,
         signer: &Account,
     ) -> anyhow::Result<ExecutionFinalResult> {
-        signer
+        let result = signer
             .call(
                 self.get_contract_id(),
                 "fetch_validator_set_from_restaking_base",
@@ -21,18 +21,28 @@ pub trait AppchainAnchorIbc: NearContract {
                     "Failed to fetch_validator_set_from_restaking_base, error: {:?}",
                     e
                 )
-            })
+            });
+        tracing::info!(
+            "get_consumer_chains_undistributed_rewards, result: {:?}",
+            result
+        );
+        result
     }
 
     async fn send_vsc_packet_to_appchain(
         &self,
         signer: &Account,
     ) -> anyhow::Result<ExecutionFinalResult> {
-        signer
+        let result = signer
             .call(self.get_contract_id(), "send_vsc_packet_to_appchain")
             .max_gas()
             .transact()
             .await
-            .map_err(|e| anyhow!("Failed to send_vsc_packet_to_appchain, error: {:?}", e))
+            .map_err(|e| anyhow!("Failed to send_vsc_packet_to_appchain, error: {:?}", e));
+        tracing::info!(
+            "get_consumer_chains_undistributed_rewards, result: {:?}",
+            result
+        );
+        result
     }
 }

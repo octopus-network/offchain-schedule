@@ -47,7 +47,7 @@ async fn main() -> anyhow::Result<()> {
         let result =
             fetch_validator_set_from_restaking_base_and_send_vsc_packet_to_appchain_in_anchors()
                 .await;
-        info!("transfer_for_cross_chain result: {:?}", result);
+        info!("fetch_validator_set_from_restaking_base_and_send_vsc_packet_to_appchain_in_anchors result: {:?}", result);
     });
 
     loop {
