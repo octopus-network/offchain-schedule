@@ -42,8 +42,7 @@ async fn get_all_anchor_ibc() -> anyhow::Result<Vec<AppchainAnchorIbcContract>> 
             .get_appchain_status_of(signer, appchain_id.clone())
             .await?;
 
-        if matches!(status.appchain_state, AppchainState::Active)
-            && matches!(status.appchain_metadata.appchain_type, AppchainType::Cosmos)
+        if matches!(status.appchain_metadata.appchain_type, AppchainType::Cosmos)
         {
             active_cosmos_appchain_ids
                 .push(format!("{}.{}", appchain_id, registry.contract_id).parse()?);
