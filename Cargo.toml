@@ -30,3 +30,4 @@ chrono = "0.4.31"
 
 tracing = "0.1"
 tracing-subscriber = { version = "0.3.5", features = ["env-filter"] }
+dotenv = "0.15.0"

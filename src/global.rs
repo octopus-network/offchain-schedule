@@ -1,3 +1,4 @@
+use dotenv::dotenv;
 use std::env;
 
 use anyhow::{anyhow, Ok};
@@ -68,6 +69,7 @@ pub struct SystemEnv {
 }
 
 pub async fn init_env_config() -> anyhow::Result<()> {
+    dotenv().ok();
     let sys_env = SystemEnv {
         near_env: env::var("NEAR_ENV")
             .map_err(|e| anyhow!("NEAR_ENV environment variable not found"))?
