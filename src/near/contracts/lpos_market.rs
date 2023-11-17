@@ -79,25 +79,6 @@ impl LposMarket {
         Ok(result)
     }
 
-    pub async fn get_consumer_chains_undistributed_rewards(
-        &self,
-        signer: &Account,
-    ) -> anyhow::Result<Vec<(ConsumerChainId, u32)>> {
-        let result: Vec<(ConsumerChainId, u32)> = signer
-            .view(
-                &self.contract_id,
-                "get_consumer_chains_undistributed_rewards",
-            )
-            .args_json(json!({}))
-            .await?
-            .json()?;
-        tracing::info!(
-            "get_consumer_chains_undistributed_rewards, result: {:?}",
-            result
-        );
-        Ok(result)
-    }
-
     pub async fn get_validators_undistributed_rewards(
         &self,
         signer: &Account,
