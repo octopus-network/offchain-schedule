@@ -88,6 +88,7 @@ impl LposMarket {
                 &self.contract_id,
                 "get_consumer_chains_undistributed_rewards",
             )
+            .args_json(json!({}))
             .await?
             .json()?;
         tracing::info!(
@@ -103,6 +104,7 @@ impl LposMarket {
     ) -> anyhow::Result<Vec<(AccountId, u32)>> {
         let result: Vec<(AccountId, u32)> = signer
             .view(&self.contract_id, "get_validators_undistributed_rewards")
+            .args_json(json!({}))
             .await?
             .json()?;
 

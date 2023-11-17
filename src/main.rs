@@ -32,7 +32,7 @@ async fn main() -> anyhow::Result<()> {
 
     let mut scheduler = AsyncScheduler::new();
 
-    scheduler.every(30.seconds()).run(|| async {
+    scheduler.every(1.hours()).run(|| async {
         let result = distribute_lpos_market_reward().await;
         info!("distribute_lpos_market_reward result: {:?}", result);
     });
