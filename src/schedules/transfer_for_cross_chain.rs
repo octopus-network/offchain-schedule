@@ -1,13 +1,10 @@
 use serde::Serialize;
 
-use crate::*;
+use crate::{near::contracts::nep141::Nep141, *};
 
 pub async fn transfer_for_cross_chain() -> anyhow::Result<()> {
     info!("distribute_lpos_market_reward");
 
-    let otto_token = OTTO_TOKEN
-        .get()
-        .ok_or(anyhow::anyhow!("Failed to get OTTO_TOKEN"))?;
     let sys_env = SYS_ENV
         .get()
         .ok_or(anyhow::anyhow!("Failed to get SYS_ENV"))?;
@@ -15,21 +12,23 @@ pub async fn transfer_for_cross_chain() -> anyhow::Result<()> {
         .get()
         .ok_or(anyhow::anyhow!("Failed to get SIGNER"))?;
 
-    let transfer_call_msg = serde_json::to_string(&TransferCallMsg {
-        receiver: sys_env.dst_chain_transfer_receiver.clone(),
-        timeout_seconds: "300".to_string(),
-    })?;
-
-    otto_token
-        .ft_transfer_call(
-            signer,
-            sys_env.cross_chain_transfer_receiver.clone(),
-            "1".to_string(),
-            transfer_call_msg,
-            None,
-        )
-        .await?
-        .into_result()?;
+    for cross_chain_transfer_info in &sys_env.cross_chain_transfer_info_list {
+        let transfer_call_msg = serde_json::to_string(&TransferCallMsg {
+            receiver: sys_env.dst_chain_transfer_receiver.clone(),
+            timeout_seconds: "300".to_string(),
+        })?;
+        let nep141 = Nep141::new(cross_chain_transfer_info.token.clone());
+        nep141
+            .ft_transfer_call(
+                signer,
+                cross_chain_transfer_info.channel.clone(),
+                "1".to_string(),
+                transfer_call_msg,
+                None,
+            )
+            .await?
+            .into_result()?;
+    }
 
     Ok(())
 }

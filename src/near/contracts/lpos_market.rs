@@ -1,9 +1,6 @@
-use crate::{cmd_args::NearNetwork, *};
 use anyhow::{anyhow, Ok};
 use near_workspaces::{result::ExecutionFinalResult, Account, AccountId};
 use serde_json::json;
-
-use crate::types::ConsumerChainId;
 
 #[derive(Debug)]
 pub struct LposMarket {
@@ -12,16 +9,6 @@ pub struct LposMarket {
 
 impl LposMarket {
     pub fn new(contract_id: AccountId) -> Self {
-        Self { contract_id }
-    }
-
-    pub fn new_from_network(network: &NearNetwork) -> Self {
-        let contract_id = match network {
-            NearNetwork::Mainnet => {
-                unimplemented!()
-            }
-            NearNetwork::Testnet => "contract-4.lpos-market.testnet".parse().unwrap(),
-        };
         Self { contract_id }
     }
 
@@ -46,23 +33,6 @@ impl LposMarket {
             .call(&self.contract_id, "distribute_latest_reward_in_validator")
             .max_gas()
             .args_json(json!({ "validator_id": validator_id }))
-            .transact()
-            .await
-            .unwrap()
-    }
-
-    pub async fn distribute_latest_sponsor_reward_in_consumer_chain(
-        &self,
-        signer: &Account,
-        consumer_chain_id: ConsumerChainId,
-    ) -> ExecutionFinalResult {
-        signer
-            .call(
-                &self.contract_id,
-                "distribute_latest_sponsor_reward_in_consumer_chain",
-            )
-            .args_json(json!({ "consumer_chain_id": consumer_chain_id }))
-            .max_gas()
             .transact()
             .await
             .unwrap()
