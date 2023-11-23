@@ -4,14 +4,14 @@ use crate::schedules::anchor_actions::fetch_validator_set_from_restaking_base_an
 use crate::schedules::transfer_for_cross_chain::transfer_for_cross_chain;
 use anyhow::anyhow;
 use async_trait::async_trait;
-use clokwerk::{AsyncScheduler, Interval::*, Job};
-use clokwerk::{Scheduler, TimeUnits};
-use cmd_args::CmdArgs;
+use clokwerk::AsyncScheduler;
+use clokwerk::TimeUnits;
 use global::*;
-use near_workspaces::AccountId;
-use near_workspaces::{result::ExecutionFinalResult, Account};
+use near_gas::NearGas;
+use near_workspaces::{result::ExecutionFinalResult, Account, AccountId};
 use schedules::distribute_rewards::distribute_lpos_market_reward;
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use tracing::info;
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter, Registry};
 
@@ -37,8 +37,7 @@ async fn main() -> anyhow::Result<()> {
         info!("distribute_lpos_market_reward result: {:?}", result);
     });
 
-    // todo is 1 hours suitable?
-    scheduler.every(1.hours()).run(|| async {
+    scheduler.every(6.hours()).run(|| async {
         let result = transfer_for_cross_chain().await;
         info!("transfer_for_cross_chain result: {:?}", result);
     });

@@ -1,7 +1,6 @@
 use std::str::FromStr;
 
 use clap::{command, Parser};
-use near_workspaces::Network;
 
 #[derive(clap::ValueEnum, Debug, Clone)]
 pub enum NearNetwork {

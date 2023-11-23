@@ -1,7 +1,3 @@
-use near_gas::NearGas;
-use near_workspaces::{result::ExecutionFinalResult, Account, AccountId};
-use serde_json::json;
-
 use crate::*;
 
 #[derive(Debug)]
@@ -17,13 +13,13 @@ impl Nep141 {
     pub async fn ft_transfer_call(
         &self,
         signer: &Account,
-        receiver_id: String,
+        receiver_id: AccountId,
         amount: String,
         msg: String,
         memo: Option<String>,
     ) -> anyhow::Result<ExecutionFinalResult> {
         signer
-            .call(&self.contract_id, "ft_transfer")
+            .call(&self.contract_id, "ft_transfer_call")
             .args_json(json!({
                 "receiver_id": receiver_id,
                 "amount": amount,
