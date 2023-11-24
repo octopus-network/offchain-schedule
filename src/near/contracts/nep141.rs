@@ -26,7 +26,7 @@ impl Nep141 {
                 "msg": msg,
                 "memo": memo
             }))
-            .gas(NearGas::from_tgas(80))
+            .gas(NearGas::from_tgas(200))
             .deposit(1)
             .transact()
             .await
