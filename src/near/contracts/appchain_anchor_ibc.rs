@@ -1,9 +1,41 @@
-use crate::*;
+use crate::{types::RewardDistribution, *};
 
 use super::NearContract;
 
 #[async_trait]
 pub trait AppchainAnchorIbc: NearContract {
+    async fn distribute_pending_rewards(
+        &self,
+        signer: &Account,
+    ) -> anyhow::Result<ExecutionFinalResult> {
+        let result = signer
+            .call(self.get_contract_id(), "distribute_pending_rewards")
+            .max_gas()
+            .transact()
+            .await
+            .map_err(|e| {
+                anyhow!(
+                    "Failed to fetch_validator_set_from_restaking_base, error: {:?}",
+                    e
+                )
+            });
+
+        tracing::info!("distribute_pending_rewards, result: {:?}", result);
+        result
+    }
+
+    async fn get_pending_rewards(
+        &self,
+        signer: &Account,
+    ) -> anyhow::Result<Vec<RewardDistribution>> {
+        let result = signer
+            .view(self.get_contract_id(), "get_pending_rewards")
+            .await?
+            .json()?;
+
+        Ok(result)
+    }
+
     async fn fetch_validator_set_from_restaking_base(
         &self,
         signer: &Account,

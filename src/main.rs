@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use crate::schedules::anchor_actions::distribute_pending_rewards_in_anchor_ibc;
 use crate::schedules::anchor_actions::fetch_validator_set_from_restaking_base_and_send_vsc_packet_to_appchain_in_anchors;
 use crate::schedules::transfer_for_cross_chain::transfer_for_cross_chain;
 use anyhow::anyhow;
@@ -33,6 +34,8 @@ async fn main() -> anyhow::Result<()> {
     let mut scheduler = AsyncScheduler::new();
 
     scheduler.every(1.hours()).run(|| async {
+        let result = distribute_pending_rewards_in_anchor_ibc().await;
+        info!("distribute_lpos_market_reward result: {:?}", result);
         let result = distribute_lpos_market_reward().await;
         info!("distribute_lpos_market_reward result: {:?}", result);
     });

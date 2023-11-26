@@ -56,9 +56,11 @@ pub async fn init_env_config() -> anyhow::Result<()> {
             .parse()?,
         dst_chain_transfer_receiver: env::var("DST_CHAIN_TRANSFER_RECEIVER")
             .map_err(|_| anyhow!("DST_CHAIN_TRANSFER_RECEIVER environment variable not found"))?,
-        cross_chain_transfer_info_list: serde_json::from_str(&env::var("CROSS_CHAIN_TRANSFER_INFO_LIST").map_err(|_| {
-            anyhow!("CROSS_CHAIN_TRANSFER_INFO_LIST environment variable not found")
-        })?)?,
+        cross_chain_transfer_info_list: serde_json::from_str(
+            &env::var("CROSS_CHAIN_TRANSFER_INFO_LIST").map_err(|_| {
+                anyhow!("CROSS_CHAIN_TRANSFER_INFO_LIST environment variable not found")
+            })?,
+        )?,
         active_ibc_anchor_id_list: serde_json::from_str(
             &env::var("ACTIVE_IBC_ANCHOR_ID_LIST")
                 .map_err(|_| anyhow!("ACTIVE_IBC_ANCHOR_ID_LIST environment variable not found"))?,
