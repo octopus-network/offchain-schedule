@@ -1,9 +1,34 @@
+use anyhow::Ok;
 use itertools::Itertools;
 
 use crate::{
     near::contracts::{appchain_anchor_ibc::AppchainAnchorIbc, AppchainAnchorIbcContract},
     *,
 };
+
+pub async fn distribute_pending_rewards_in_anchor_ibc() -> anyhow::Result<()> {
+    let sys_env = SYS_ENV.get().unwrap();
+    let appchain_anchor_ibc_list = sys_env
+        .active_ibc_anchor_id_list
+        .iter()
+        .map(|id| AppchainAnchorIbcContract {
+            contract_id: id.clone(),
+        })
+        .collect_vec();
+
+    let signer = SIGNER.get().ok_or(anyhow!("Failed to get signer"))?;
+    for appchain_anchor_ibc in appchain_anchor_ibc_list {
+        let result = appchain_anchor_ibc.get_pending_rewards(signer).await?;
+        for _ in 0..result.len() {
+            appchain_anchor_ibc
+                .distribute_pending_rewards(signer)
+                .await?
+                .into_result()?;
+        }
+    }
+
+    Ok(())
+}
 
 pub async fn fetch_validator_set_from_restaking_base_and_send_vsc_packet_to_appchain_in_anchors(
 ) -> anyhow::Result<()> {
