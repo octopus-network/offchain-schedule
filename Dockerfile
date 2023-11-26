@@ -30,6 +30,8 @@ RUN cargo build --locked --release
 # (e.g.,    debian@sha256:ac707220fbd7b67fc19b112cee8170b41a9e97f703f588b2cdbbcdcecdd8af57).
 FROM debian:bullseye-slim AS final
 
+RUN apt-get update && apt-get install -y ca-certificates && update-ca-certificates
+
 # Create a non-privileged user that the app will run under.
 # See https://docs.docker.com/develop/develop-images/dockerfile_best-practices/   #user
 ARG UID=10001
