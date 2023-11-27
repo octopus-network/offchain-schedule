@@ -3,6 +3,7 @@ use std::time::Duration;
 use crate::schedules::anchor_actions::distribute_pending_rewards_in_anchor_ibc;
 use crate::schedules::anchor_actions::fetch_validator_set_from_restaking_base_and_send_vsc_packet_to_appchain_in_anchors;
 use crate::schedules::canister_balance::check_canister_balance;
+use crate::schedules::near_account_balance::check_near_account_balance;
 use crate::schedules::transfer_for_cross_chain::transfer_for_cross_chain;
 use anyhow::anyhow;
 use async_trait::async_trait;
@@ -55,6 +56,9 @@ async fn main() -> anyhow::Result<()> {
 
         let result = check_canister_balance().await;
         info!("check_canister_balance result: {:?}", result);
+
+        let result = check_near_account_balance().await;
+        info!("check_near_account_balance result: {:?}", result);
     });
 
     loop {

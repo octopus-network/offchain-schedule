@@ -37,6 +37,7 @@ pub struct SystemEnv {
     pub(crate) cross_chain_transfer_info_list: Vec<CrossChainTransferInfo>,
     pub(crate) active_ibc_anchor_id_list: Vec<AccountId>,
     pub(crate) canister_info_list: Vec<CanisterInfo>,
+    pub(crate) near_account_id_list: Vec<AccountId>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -90,6 +91,10 @@ pub async fn init_env_config() -> anyhow::Result<()> {
                     .expect("Cannot create canister_id"),
             })
             .collect(),
+        near_account_id_list: serde_json::from_str(
+            &env::var("NEAR_ACCOUNT_ID_LIST")
+                .map_err(|_| anyhow!("NEAR_ACCOUNT_ID_LIST environment variable not found"))?,
+        )?,
     };
 
     match &sys_env.near_env {
