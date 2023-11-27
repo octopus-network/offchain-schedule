@@ -2,16 +2,19 @@ use dotenv::dotenv;
 use std::env;
 
 use anyhow::{anyhow, Ok};
+use ic_agent::export::Principal;
+use ic_agent::identity::Secp256k1Identity;
 use near_workspaces::{
     network::{Mainnet, Testnet},
     Account, AccountId, Worker,
 };
+use serde::{Deserialize, Serialize};
 use tokio::sync::OnceCell;
 
 use crate::{
     cmd_args::NearNetwork,
     near::contracts::{lpos_market::LposMarket, AppchainRegistryContract},
-    types::CrossChainTransferInfo,
+    types::{CanisterInfo, CrossChainTransferInfo},
 };
 
 pub static NEAR_MAINNET_WORKER: OnceCell<Worker<Mainnet>> = OnceCell::const_new();
@@ -33,10 +36,23 @@ pub struct SystemEnv {
     pub(crate) dst_chain_transfer_receiver: String,
     pub(crate) cross_chain_transfer_info_list: Vec<CrossChainTransferInfo>,
     pub(crate) active_ibc_anchor_id_list: Vec<AccountId>,
+    pub(crate) canister_info_list: Vec<CanisterInfo>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct CanisterPair {
+    pub identity_pem: String,
+    pub canister_id: String,
 }
 
 pub async fn init_env_config() -> anyhow::Result<()> {
     dotenv().ok();
+
+    let canister_pairs: Vec<CanisterPair> = serde_json::from_str(
+        &env::var("CANISTER_INFO_LIST")
+            .map_err(|_| anyhow!("CANISTER_INFO_LIST environment variable not found"))?,
+    )?;
+
     let sys_env = SystemEnv {
         near_env: env::var("NEAR_ENV")
             .map_err(|_| anyhow!("NEAR_ENV environment variable not found"))?
@@ -65,6 +81,15 @@ pub async fn init_env_config() -> anyhow::Result<()> {
             &env::var("ACTIVE_IBC_ANCHOR_ID_LIST")
                 .map_err(|_| anyhow!("ACTIVE_IBC_ANCHOR_ID_LIST environment variable not found"))?,
         )?,
+        canister_info_list: canister_pairs
+            .iter()
+            .map(|pair| CanisterInfo {
+                agent_identity: Secp256k1Identity::from_pem(pair.identity_pem.as_bytes())
+                    .expect("Cannot create secp256k1 identity from PEM file."),
+                canister_id: Principal::from_text(pair.canister_id.clone())
+                    .expect("Cannot create canister_id"),
+            })
+            .collect(),
     };
 
     match &sys_env.near_env {

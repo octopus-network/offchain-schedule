@@ -2,6 +2,7 @@ use std::time::Duration;
 
 use crate::schedules::anchor_actions::distribute_pending_rewards_in_anchor_ibc;
 use crate::schedules::anchor_actions::fetch_validator_set_from_restaking_base_and_send_vsc_packet_to_appchain_in_anchors;
+use crate::schedules::canister_balance::check_canister_balance;
 use crate::schedules::transfer_for_cross_chain::transfer_for_cross_chain;
 use anyhow::anyhow;
 use async_trait::async_trait;
@@ -18,6 +19,7 @@ use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, Env
 
 mod cmd_args;
 mod global;
+mod ic;
 mod near;
 mod schedules;
 mod types;
@@ -50,6 +52,9 @@ async fn main() -> anyhow::Result<()> {
             fetch_validator_set_from_restaking_base_and_send_vsc_packet_to_appchain_in_anchors()
                 .await;
         info!("fetch_validator_set_from_restaking_base_and_send_vsc_packet_to_appchain_in_anchors result: {:?}", result);
+
+        let result = check_canister_balance().await;
+        info!("check_canister_balance result: {:?}", result);
     });
 
     loop {

@@ -1,4 +1,6 @@
 use crate::*;
+use ic_agent::export::Principal;
+use ic_agent::identity::Secp256k1Identity;
 use near_workspaces::AccountId;
 
 #[allow(unused)]
@@ -15,4 +17,10 @@ pub struct RewardDistribution {
     pub validator_set_id: String,
     pub amount: String,
     pub timestamp: String,
+}
+
+#[derive(Debug)]
+pub struct CanisterInfo {
+    pub agent_identity: Secp256k1Identity,
+    pub canister_id: Principal,
 }
