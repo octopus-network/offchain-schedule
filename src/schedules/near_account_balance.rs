@@ -12,7 +12,7 @@ pub async fn check_near_account_balance() -> anyhow::Result<()> {
     for account in sys_env.near_account_id_list.iter() {
         let balance = get_account_available_balance(account).await?;
         info!("{:?}: {:?}", account, balance);
-        if balance < 200 {
+        if balance < 20 {
             info!(
                 "OCTOPUS_ALERT: insufficient near account balance: {:?}: {:?}",
                 account, balance

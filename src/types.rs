@@ -16,7 +16,7 @@ pub struct CrossChainTransferInfo {
 pub struct RewardDistribution {
     pub validator_set_id: String,
     pub amount: String,
-    pub timestamp: String,
+    pub timestamp: u64,
 }
 
 #[derive(Debug)]
