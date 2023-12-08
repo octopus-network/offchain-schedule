@@ -43,12 +43,12 @@ async fn main() -> anyhow::Result<()> {
         info!("distribute_lpos_market_reward result: {:?}", result);
     });
 
-    scheduler.every(6.hours()).run(|| async {
+    scheduler.every(20.minutes()).run(|| async {
         let result = transfer_for_cross_chain().await;
         info!("transfer_for_cross_chain result: {:?}", result);
     });
 
-    scheduler.every(1.days()).run(|| async {
+    scheduler.every(2.hours()).run(|| async {
         let result =
             fetch_validator_set_from_restaking_base_and_send_vsc_packet_to_appchain_in_anchors()
                 .await;
