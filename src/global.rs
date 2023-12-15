@@ -14,7 +14,7 @@ use tokio::sync::OnceCell;
 use crate::{
     cmd_args::NearNetwork,
     near::contracts::{lpos_market::LposMarket, AppchainRegistryContract},
-    types::{CanisterInfo, CrossChainTransferInfo},
+    types::CanisterInfo,
 };
 
 pub static NEAR_MAINNET_WORKER: OnceCell<Worker<Mainnet>> = OnceCell::const_new();
@@ -33,8 +33,6 @@ pub struct SystemEnv {
     pub(crate) schedule_signer_secret_key: String,
     pub(crate) lpos_market_contract: String,
     pub(crate) appchain_registry_contract: AccountId,
-    pub(crate) dst_chain_transfer_receiver: String,
-    pub(crate) cross_chain_transfer_info_list: Vec<CrossChainTransferInfo>,
     pub(crate) active_ibc_anchor_id_list: Vec<AccountId>,
     pub(crate) canister_info_list: Vec<CanisterInfo>,
     pub(crate) near_account_id_list: Vec<AccountId>,
@@ -71,13 +69,6 @@ pub async fn init_env_config() -> anyhow::Result<()> {
         appchain_registry_contract: env::var("APPCHAIN_REGISTRY_CONTRACT")
             .map_err(|_| anyhow!("APPCHAIN_REGISTRY_CONTRACT environment variable not found"))?
             .parse()?,
-        dst_chain_transfer_receiver: env::var("DST_CHAIN_TRANSFER_RECEIVER")
-            .map_err(|_| anyhow!("DST_CHAIN_TRANSFER_RECEIVER environment variable not found"))?,
-        cross_chain_transfer_info_list: serde_json::from_str(
-            &env::var("CROSS_CHAIN_TRANSFER_INFO_LIST").map_err(|_| {
-                anyhow!("CROSS_CHAIN_TRANSFER_INFO_LIST environment variable not found")
-            })?,
-        )?,
         active_ibc_anchor_id_list: serde_json::from_str(
             &env::var("ACTIVE_IBC_ANCHOR_ID_LIST")
                 .map_err(|_| anyhow!("ACTIVE_IBC_ANCHOR_ID_LIST environment variable not found"))?,

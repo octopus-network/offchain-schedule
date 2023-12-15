@@ -24,8 +24,6 @@ SCHEDULE_SIGNER=xxx.testnet
 LPOS_MARKET_CONTRACT=contract-4.lpos-market.testnet
 OTTO_TOKEN_CONTRACT=oct.beta_oct_relay.testnet
 APPCHAIN_REGISTRY_CONTRACT=registry.test_oct.testnet
-CROSS_CHAIN_TRANSFER_RECEIVER=channel-0.ef.transfer.v5.nearibc.testnet
-DST_CHAIN_TRANSFER_RECEIVER=cosmos1sqkln20dw9a5779nyjw0eka4xsqrk9hdgrueql
 ```
 
 2. Run binary file.

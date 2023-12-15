@@ -4,17 +4,14 @@ use crate::schedules::anchor_actions::distribute_pending_rewards_in_anchor_ibc;
 use crate::schedules::anchor_actions::fetch_validator_set_from_restaking_base_and_send_vsc_packet_to_appchain_in_anchors;
 use crate::schedules::canister_balance::check_canister_balance;
 use crate::schedules::near_account_balance::check_near_account_balance;
-use crate::schedules::transfer_for_cross_chain::transfer_for_cross_chain;
 use anyhow::anyhow;
 use async_trait::async_trait;
 use clokwerk::AsyncScheduler;
 use clokwerk::TimeUnits;
 use global::*;
-use near_gas::NearGas;
 use near_workspaces::{result::ExecutionFinalResult, Account, AccountId};
 use schedules::distribute_rewards::distribute_lpos_market_reward;
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use tracing::info;
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter, Registry};
 
@@ -43,11 +40,6 @@ async fn main() -> anyhow::Result<()> {
         info!("distribute_lpos_market_reward result: {:?}", result);
     });
 
-    scheduler.every(20.minutes()).run(|| async {
-        let result = transfer_for_cross_chain().await;
-        info!("transfer_for_cross_chain result: {:?}", result);
-    });
-
     scheduler.every(2.hours()).run(|| async {
         let result =
             fetch_validator_set_from_restaking_base_and_send_vsc_packet_to_appchain_in_anchors()
@@ -70,7 +62,11 @@ async fn main() -> anyhow::Result<()> {
 pub fn init_log() {
     let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
     // 输出到控制台中
-    let formatting_layer = fmt::layer().pretty().with_writer(std::io::stderr);
+    let formatting_layer = fmt::layer()
+        .without_time()
+        .json()
+        .flatten_event(true)
+        .with_writer(std::io::stderr);
 
     Registry::default()
         .with(env_filter)
