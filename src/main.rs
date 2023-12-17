@@ -7,7 +7,7 @@ use crate::schedules::near_account_balance::check_near_account_balance;
 use anyhow::anyhow;
 use async_trait::async_trait;
 use clokwerk::AsyncScheduler;
-use clokwerk::TimeUnits;
+use clokwerk::{Job, TimeUnits};
 use global::*;
 use near_workspaces::{result::ExecutionFinalResult, Account, AccountId};
 use schedules::distribute_rewards::distribute_lpos_market_reward;
@@ -33,14 +33,12 @@ async fn main() -> anyhow::Result<()> {
 
     let mut scheduler = AsyncScheduler::new();
 
-    scheduler.every(1.hours()).run(|| async {
+    scheduler.every(1.day()).at("1:30 pm").run(|| async {
         let result = distribute_pending_rewards_in_anchor_ibc().await;
         info!("distribute_lpos_market_reward result: {:?}", result);
         let result = distribute_lpos_market_reward().await;
         info!("distribute_lpos_market_reward result: {:?}", result);
-    });
 
-    scheduler.every(2.hours()).run(|| async {
         let result =
             fetch_validator_set_from_restaking_base_and_send_vsc_packet_to_appchain_in_anchors()
                 .await;
