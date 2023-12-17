@@ -33,6 +33,14 @@ async fn main() -> anyhow::Result<()> {
 
     let mut scheduler = AsyncScheduler::new();
 
+    scheduler.every(1.hours()).run(|| async {
+        let result = check_canister_balance().await;
+        info!("check_canister_balance result: {:?}", result);
+
+        let result = check_near_account_balance().await;
+        info!("check_near_account_balance result: {:?}", result);
+    });
+
     scheduler.every(1.day()).at("1:30 pm").run(|| async {
         let result = distribute_pending_rewards_in_anchor_ibc().await;
         info!("distribute_lpos_market_reward result: {:?}", result);
@@ -43,12 +51,6 @@ async fn main() -> anyhow::Result<()> {
             fetch_validator_set_from_restaking_base_and_send_vsc_packet_to_appchain_in_anchors()
                 .await;
         info!("fetch_validator_set_from_restaking_base_and_send_vsc_packet_to_appchain_in_anchors result: {:?}", result);
-
-        let result = check_canister_balance().await;
-        info!("check_canister_balance result: {:?}", result);
-
-        let result = check_near_account_balance().await;
-        info!("check_near_account_balance result: {:?}", result);
     });
 
     loop {
