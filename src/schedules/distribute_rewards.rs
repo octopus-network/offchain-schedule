@@ -31,7 +31,7 @@ pub async fn distribute_lpos_market_reward() -> anyhow::Result<()> {
         for _ in 0..count {
             lpos_market
                 .distribute_latest_reward_in_validator(signer, validator_id.clone())
-                .await
+                .await?
                 .into_result()?;
         }
     }

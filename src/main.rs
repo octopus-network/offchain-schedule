@@ -11,6 +11,7 @@ use clokwerk::{Job, TimeUnits};
 use global::*;
 use near_workspaces::{result::ExecutionFinalResult, Account, AccountId};
 use schedules::distribute_rewards::distribute_lpos_market_reward;
+use schedules::ping_every_validators::ping_every_validators;
 use serde::{Deserialize, Serialize};
 use tracing::info;
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter, Registry};
@@ -51,6 +52,11 @@ async fn main() -> anyhow::Result<()> {
             fetch_validator_set_from_restaking_base_and_send_vsc_packet_to_appchain_in_anchors()
                 .await;
         info!("fetch_validator_set_from_restaking_base_and_send_vsc_packet_to_appchain_in_anchors result: {:?}", result);
+    });
+
+    scheduler.every(1.day()).run(|| async {
+        let result = ping_every_validators().await;
+        info!("ping every validators result: {:?}", result);
     });
 
     loop {

@@ -2,6 +2,8 @@ use anyhow::{anyhow, Ok};
 use near_workspaces::{result::ExecutionFinalResult, Account, AccountId};
 use serde_json::json;
 
+use crate::types::ValidatorInfo;
+
 #[derive(Debug)]
 pub struct LposMarket {
     pub contract_id: AccountId,
@@ -28,14 +30,19 @@ impl LposMarket {
         &self,
         signer: &Account,
         validator_id: AccountId,
-    ) -> ExecutionFinalResult {
+    ) -> anyhow::Result<ExecutionFinalResult> {
         signer
             .call(&self.contract_id, "distribute_latest_reward_in_validator")
             .max_gas()
             .args_json(json!({ "validator_id": validator_id }))
             .transact()
             .await
-            .unwrap()
+            .map_err(|e| {
+                anyhow!(
+                    "Failed to distribute_latest_reward_in_validator, error: {:?}",
+                    e
+                )
+            })
     }
 
     pub async fn get_undistributed_rewards_count(&self, signer: &Account) -> anyhow::Result<u32> {
@@ -62,5 +69,29 @@ impl LposMarket {
         tracing::info!("get_validators_undistributed_rewards, result: {:?}", result);
 
         Ok(result)
+    }
+
+    pub async fn get_validators(&self, signer: &Account) -> anyhow::Result<Vec<ValidatorInfo>> {
+        let result = signer
+            .view(&self.contract_id, "get_validators")
+            .args_json(json!({}))
+            .await?
+            .json()?;
+        tracing::info!("get_validators, result: {:?}", result);
+        Ok(result)
+    }
+
+    pub async fn ping(
+        &self,
+        signer: &Account,
+        validator_id: AccountId,
+    ) -> anyhow::Result<ExecutionFinalResult> {
+        signer
+            .call(&self.contract_id, "ping")
+            .max_gas()
+            .args_json(json!({ "validator_id": validator_id }))
+            .transact()
+            .await
+            .map_err(|e| anyhow!("Failed to ping, error: {:?}", e))
     }
 }
