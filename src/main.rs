@@ -40,23 +40,21 @@ async fn main() -> anyhow::Result<()> {
 
         let result = check_near_account_balance().await;
         info!("check_near_account_balance result: {:?}", result);
-    });
 
-    scheduler.every(1.day()).at("1:30 pm").run(|| async {
         let result = distribute_pending_rewards_in_anchor_ibc().await;
         info!("distribute_lpos_market_reward result: {:?}", result);
         let result = distribute_lpos_market_reward().await;
         info!("distribute_lpos_market_reward result: {:?}", result);
 
+        let result = ping_every_validators().await;
+        info!("ping every validators result: {:?}", result);
+    });
+
+    scheduler.every(2.hours()).run(|| async {
         let result =
             fetch_validator_set_from_restaking_base_and_send_vsc_packet_to_appchain_in_anchors()
                 .await;
         info!("fetch_validator_set_from_restaking_base_and_send_vsc_packet_to_appchain_in_anchors result: {:?}", result);
-    });
-
-    scheduler.every(1.day()).run(|| async {
-        let result = ping_every_validators().await;
-        info!("ping every validators result: {:?}", result);
     });
 
     loop {
