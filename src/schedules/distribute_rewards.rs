@@ -25,11 +25,11 @@ pub async fn distribute_lpos_market_reward() -> anyhow::Result<()> {
 
     // One reward info in validator should be able to finish distribute less or equal than three transactions.
     let mut limit_times = 10;
-    while limit_times>0  {
+    while limit_times > 0 {
         let undistributed_validators = lpos_market
-        .get_validators_undistributed_rewards(signer)
-        .await?;
-        
+            .get_validators_undistributed_rewards(signer)
+            .await?;
+
         if undistributed_validators.len() == 0 {
             break;
         }
@@ -43,9 +43,11 @@ pub async fn distribute_lpos_market_reward() -> anyhow::Result<()> {
             }
         }
         limit_times -= 1;
-    };
+    }
     if limit_times == 0 {
-        return  Err(anyhow!("The times of distribute reward jobs exceed than exception"));
+        return Err(anyhow!(
+            "The times of distribute reward jobs exceed than exception"
+        ));
     }
 
     Ok(())
