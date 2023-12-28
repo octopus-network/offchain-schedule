@@ -4,6 +4,34 @@ use super::NearContract;
 
 #[async_trait]
 pub trait AppchainAnchorIbc: NearContract {
+    async fn get_pending_slash_packets(&self, signer: &Account) -> anyhow::Result<Vec<String>> {
+        let result = signer
+            .view(self.get_contract_id(), "get_pending_slash_packets")
+            .await?
+            .json()?;
+
+        Ok(result)
+    }
+
+    async fn process_first_pending_slash_packet(
+        &self,
+        signer: &Account,
+    ) -> anyhow::Result<ExecutionFinalResult> {
+        let result = signer
+            .call(self.get_contract_id(), "process_first_pending_slash_packet")
+            .max_gas()
+            .transact()
+            .await
+            .map_err(|e| {
+                anyhow!(
+                    "Failed to process_first_pending_slash_packet, error: {:?}",
+                    e
+                )
+            });
+
+        result
+    }
+
     async fn distribute_pending_rewards(
         &self,
         signer: &Account,
