@@ -24,7 +24,7 @@ pub async fn distribute_lpos_market_reward() -> anyhow::Result<()> {
     }
 
     // One reward info in validator should be able to finish distribute less or equal than three transactions.
-    let mut limit_times = 10;
+    let mut limit_times = 12;
     while limit_times > 0 {
         let undistributed_validators = lpos_market
             .get_validators_undistributed_rewards(signer)
