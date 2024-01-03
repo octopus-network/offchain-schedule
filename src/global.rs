@@ -13,7 +13,9 @@ use tokio::sync::OnceCell;
 
 use crate::{
     cmd_args::NearNetwork,
-    near::contracts::{lpos_market::LposMarket, AppchainRegistryContract},
+    near::contracts::{
+        lpos_market::LposMarket, restaking_base::RestakingBase, AppchainRegistryContract,
+    },
     types::CanisterInfo,
 };
 
@@ -21,6 +23,7 @@ pub static NEAR_MAINNET_WORKER: OnceCell<Worker<Mainnet>> = OnceCell::const_new(
 pub static NEAR_TESTNET_WORKER: OnceCell<Worker<Testnet>> = OnceCell::const_new();
 pub static SIGNER: OnceCell<Account> = OnceCell::const_new();
 pub static LPOS_MARKET: OnceCell<LposMarket> = OnceCell::const_new();
+pub static RESTAKING_BASE: OnceCell<RestakingBase> = OnceCell::const_new();
 pub static APPCHAIN_REGISTRY_CONTRACT: OnceCell<AppchainRegistryContract> = OnceCell::const_new();
 pub static SYS_ENV: OnceCell<SystemEnv> = OnceCell::const_new();
 
@@ -32,6 +35,7 @@ pub struct SystemEnv {
     pub(crate) schedule_signer: AccountId,
     pub(crate) schedule_signer_secret_key: String,
     pub(crate) lpos_market_contract: String,
+    pub(crate) restaking_base_contract: String,
     pub(crate) appchain_registry_contract: AccountId,
     pub(crate) active_ibc_anchor_id_list: Vec<AccountId>,
     pub(crate) canister_info_list: Vec<CanisterInfo>,
@@ -66,6 +70,8 @@ pub async fn init_env_config() -> anyhow::Result<()> {
             .map_err(|_| anyhow!("SCHEDULE_SIGNER_SECRET_KEY environment variable not found"))?,
         lpos_market_contract: env::var("LPOS_MARKET_CONTRACT")
             .map_err(|_| anyhow!("LPOS_MARKET_CONTRACT environment variable not found"))?,
+        restaking_base_contract: env::var("RESTAKING_BASE_CONTRACT")
+            .map_err(|_| anyhow!("RESTAKING_BASE_CONTRACT environment variable not found"))?,
         appchain_registry_contract: env::var("APPCHAIN_REGISTRY_CONTRACT")
             .map_err(|_| anyhow!("APPCHAIN_REGISTRY_CONTRACT environment variable not found"))?
             .parse()?,
@@ -126,6 +132,7 @@ pub async fn init_env_config() -> anyhow::Result<()> {
     }
 
     LPOS_MARKET.set(LposMarket::new(sys_env.lpos_market_contract.parse()?))?;
+    RESTAKING_BASE.set(RestakingBase::new(sys_env.restaking_base_contract.parse()?))?;
     APPCHAIN_REGISTRY_CONTRACT.set(AppchainRegistryContract {
         contract_id: sys_env.appchain_registry_contract.parse()?,
     })?;

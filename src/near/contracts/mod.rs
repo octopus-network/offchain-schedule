@@ -5,6 +5,7 @@ use self::{appchain_anchor_ibc::AppchainAnchorIbc, appchain_registry::AppchainRe
 pub mod appchain_anchor_ibc;
 pub mod appchain_registry;
 pub mod lpos_market;
+pub mod restaking_base;
 pub mod rpc;
 
 pub trait NearContract {
