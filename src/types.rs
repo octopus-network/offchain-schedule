@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::*;
 use ic_agent::export::Principal;
 use ic_agent::identity::Secp256k1Identity;
@@ -39,4 +41,26 @@ pub struct ValidatorInfo {
     pub unstake_withdraw_certificate: Option<String>,
     pub is_destroyable: bool,
     pub undistributed_reward_count: u32,
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum MultiTxsOperationProcessingResult {
+    NeedMoreGas,
+    Ok,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ValidatorDetail {
+    pub validator_id: AccountId,
+    pub escrow_id: AccountId,
+    pub total_share_balance: String,
+    pub total_staked_balance: String,
+    pub delegators: Vec<AccountId>,
+    pub select_staking_pool: Option<AccountId>,
+    pub share_balance: String,
+    pub rewards: HashMap<AccountId, String>,
+    pub validator_staked_balance: String,
+    pub status: ValidatorStatus,
+    pub unstake_withdraw_certificate: Option<String>,
+    pub is_destroyable: bool,
 }

@@ -2,7 +2,7 @@ use anyhow::{anyhow, Ok};
 use near_workspaces::{result::ExecutionFinalResult, Account, AccountId};
 use serde_json::json;
 
-use crate::types::ValidatorInfo;
+use crate::types::{ValidatorDetail, ValidatorInfo};
 
 #[derive(Debug)]
 pub struct LposMarket {
@@ -12,6 +12,103 @@ pub struct LposMarket {
 impl LposMarket {
     pub fn new(contract_id: AccountId) -> Self {
         Self { contract_id }
+    }
+
+    pub async fn clean_validator_state(
+        &self,
+        signer: &Account,
+        validator_id: AccountId,
+    ) -> anyhow::Result<ExecutionFinalResult> {
+        signer
+            .call(&self.contract_id, "clean_validator_state")
+            .args_json(json!({
+                "validator_id": validator_id
+            }))
+            .max_gas()
+            .transact()
+            .await
+            .map_err(|e| anyhow!("Failed to clean_validator_state, error: {:?}", e))
+    }
+
+    pub async fn withdraw_unstake(
+        &self,
+        signer: &Account,
+        validator_id: AccountId,
+    ) -> anyhow::Result<ExecutionFinalResult> {
+        signer
+            .call(&self.contract_id, "withdraw_unstake")
+            .args_json(json!({
+                "validator_id": validator_id
+            }))
+            .max_gas()
+            .transact()
+            .await
+            .map_err(|e| anyhow!("Failed to withdraw_unstake, error: {:?}", e))
+    }
+
+    pub async fn get_validator_detail(
+        &self,
+        signer: &Account,
+        validator_id: AccountId,
+    ) -> anyhow::Result<Option<ValidatorDetail>> {
+        let result = signer
+            .view(&self.contract_id, "get_validator_detail")
+            .args_json(json!({
+                "validator_id": validator_id
+            }))
+            .await?
+            .json()?;
+        Ok(result)
+    }
+
+    pub async fn undelegate_in_unstake(
+        &self,
+        signer: &Account,
+        delegator_id: AccountId,
+    ) -> anyhow::Result<ExecutionFinalResult> {
+        signer
+            .call(&self.contract_id, "undelegate_in_unstake")
+            .args_json(json!({
+                "delegator_id": delegator_id
+            }))
+            .max_gas()
+            .transact()
+            .await
+            .map_err(|e| anyhow!("Failed to undelegate_in_unstake, error: {:?}", e))
+    }
+
+    pub async fn claim_reward_in_validator(
+        &self,
+        signer: &Account,
+        account_id: AccountId,
+        reward_token_id: AccountId,
+    ) -> anyhow::Result<ExecutionFinalResult> {
+        signer
+            .call(&self.contract_id, "claim_reward_in_validator")
+            .args_json(json!({
+                "account_id": account_id,
+                "reward_token_id": reward_token_id
+            }))
+            .max_gas()
+            .transact()
+            .await
+            .map_err(|e| anyhow!("Failed to claim_reward_in_validator, error: {:?}", e))
+    }
+
+    pub async fn destroy(
+        &self,
+        signer: &Account,
+        validator_id: AccountId,
+    ) -> anyhow::Result<ExecutionFinalResult> {
+        signer
+            .call(&self.contract_id, "destroy")
+            .args_json(json!({
+                "validator_id": validator_id
+            }))
+            .max_gas()
+            .transact()
+            .await
+            .map_err(|e| anyhow!("Failed to destroy, error: {:?}", e))
     }
 
     pub async fn distribute_latest_reward(

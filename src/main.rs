@@ -5,6 +5,7 @@ use crate::schedules::anchor_actions::fetch_validator_set_from_restaking_base_an
 use crate::schedules::anchor_actions::process_pending_slash_in_anchor_ibc;
 use crate::schedules::canister_balance::check_canister_balance;
 use crate::schedules::near_account_balance::check_near_account_balance;
+use crate::schedules::unstake::process_unstake_for_validators;
 use anyhow::anyhow;
 use async_trait::async_trait;
 use clokwerk::AsyncScheduler;
@@ -14,6 +15,7 @@ use near_workspaces::{result::ExecutionFinalResult, Account, AccountId};
 use schedules::distribute_rewards::distribute_lpos_market_reward;
 use schedules::ping_every_validators::ping_every_validators;
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use tracing::info;
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter, Registry};
 
@@ -63,6 +65,11 @@ async fn main() -> anyhow::Result<()> {
     scheduler.every(1.minute()).run(|| async {
         let result = process_pending_slash_in_anchor_ibc().await;
         info!("process_pending_slash_in_anchor_ibc result: {:?}", result);
+    });
+
+    scheduler.every(12.hour()).run(|| async {
+        let result = process_unstake_for_validators().await;
+        info!("process_unstake_for_validators result: {:?}", result);
     });
 
     loop {
