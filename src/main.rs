@@ -62,10 +62,10 @@ async fn main() -> anyhow::Result<()> {
         info!("ping every validators result: {:?}", result);
     });
 
-    // scheduler.every(1.minute()).run(|| async {
-    //     let result = process_pending_slash_in_anchor_ibc().await;
-    //     info!("process_pending_slash_in_anchor_ibc result: {:?}", result);
-    // });
+    scheduler.every(1.minute()).run(|| async {
+        let result = process_pending_slash_in_anchor_ibc().await;
+        info!("process_pending_slash_in_anchor_ibc result: {:?}", result);
+    });
 
     scheduler.every(12.hour()).run(|| async {
         let result = process_unstake_for_validators().await;
