@@ -6,6 +6,8 @@ use crate::{
     *,
 };
 
+use self::types::MultiTxsOperationProcessingResult;
+
 pub async fn process_pending_slash_in_anchor_ibc() -> anyhow::Result<()> {
     let sys_env = SYS_ENV.get().unwrap();
     let appchain_anchor_ibc_list = sys_env
@@ -43,12 +45,24 @@ pub async fn distribute_pending_rewards_in_anchor_ibc() -> anyhow::Result<()> {
 
     let signer = SIGNER.get().ok_or(anyhow!("Failed to get signer"))?;
     for appchain_anchor_ibc in appchain_anchor_ibc_list {
-        let result = appchain_anchor_ibc.get_pending_rewards(signer).await?;
-        for _ in 0..result.len() {
-            appchain_anchor_ibc
-                .distribute_pending_rewards(signer)
-                .await?
-                .into_result()?;
+
+        let mut max_limit_times = 20;
+        let mut result: MultiTxsOperationProcessingResult = MultiTxsOperationProcessingResult::NeedMoreGas;
+        while  max_limit_times>0 {
+        
+            result = appchain_anchor_ibc
+                    .distribute_pending_rewards(signer)
+                    .await?
+                    .into_result()?.json()?;
+
+            if matches!(result, MultiTxsOperationProcessingResult::Ok) {break;}
+    
+            max_limit_times -= 1
+        }
+        if matches!(result, MultiTxsOperationProcessingResult::NeedMoreGas) {
+            return Err(anyhow!(
+                "The times of distribute_pending_rewards jobs exceed than exception"
+            ));
         }
     }
 
