@@ -45,18 +45,20 @@ pub async fn distribute_pending_rewards_in_anchor_ibc() -> anyhow::Result<()> {
 
     let signer = SIGNER.get().ok_or(anyhow!("Failed to get signer"))?;
     for appchain_anchor_ibc in appchain_anchor_ibc_list {
-
         let mut max_limit_times = 20;
-        let mut result: MultiTxsOperationProcessingResult = MultiTxsOperationProcessingResult::NeedMoreGas;
-        while  max_limit_times>0 {
-        
+        let mut result: MultiTxsOperationProcessingResult =
+            MultiTxsOperationProcessingResult::NeedMoreGas;
+        while max_limit_times > 0 {
             result = appchain_anchor_ibc
-                    .distribute_pending_rewards(signer)
-                    .await?
-                    .into_result()?.json()?;
+                .distribute_pending_rewards(signer)
+                .await?
+                .into_result()?
+                .json()?;
 
-            if matches!(result, MultiTxsOperationProcessingResult::Ok) {break;}
-    
+            if matches!(result, MultiTxsOperationProcessingResult::Ok) {
+                break;
+            }
+
             max_limit_times -= 1
         }
         if matches!(result, MultiTxsOperationProcessingResult::NeedMoreGas) {
