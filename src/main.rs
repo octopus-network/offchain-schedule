@@ -9,8 +9,7 @@ use crate::schedules::unstake::handle_unstake_batch;
 use crate::schedules::unstake::process_unstake_for_validators;
 use anyhow::anyhow;
 use async_trait::async_trait;
-use clokwerk::AsyncScheduler;
-use clokwerk::TimeUnits;
+use clokwerk::{AsyncScheduler, Job, TimeUnits};
 use global::*;
 use near_workspaces::{result::ExecutionFinalResult, Account, AccountId};
 use schedules::distribute_rewards::distribute_lpos_market_reward;
@@ -44,14 +43,14 @@ async fn main() -> anyhow::Result<()> {
 
         let result = check_near_account_balance().await;
         info!("check_near_account_balance result: {:?}", result);
+    });
 
+    scheduler.every(1.day()).at("1:30 pm").run(|| async {
         let result = distribute_pending_rewards_in_anchor_ibc().await;
         info!("distribute_lpos_market_reward result: {:?}", result);
         let result = distribute_lpos_market_reward().await;
         info!("distribute_lpos_market_reward result: {:?}", result);
-    });
 
-    scheduler.every(2.hours()).run(|| async {
         let result =
             fetch_validator_set_from_restaking_base_and_send_vsc_packet_to_appchain_in_anchors()
                 .await;
@@ -63,10 +62,10 @@ async fn main() -> anyhow::Result<()> {
         info!("ping every validators result: {:?}", result);
     });
 
-    scheduler.every(1.minute()).run(|| async {
-        let result = process_pending_slash_in_anchor_ibc().await;
-        info!("process_pending_slash_in_anchor_ibc result: {:?}", result);
-    });
+    // scheduler.every(1.minute()).run(|| async {
+    //     let result = process_pending_slash_in_anchor_ibc().await;
+    //     info!("process_pending_slash_in_anchor_ibc result: {:?}", result);
+    // });
 
     scheduler.every(12.hour()).run(|| async {
         let result = handle_unstake_batch().await;
