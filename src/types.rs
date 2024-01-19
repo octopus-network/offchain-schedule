@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use crate::*;
 use ic_agent::export::Principal;
 use ic_agent::identity::Secp256k1Identity;
+use util::*;
 
 #[allow(unused)]
 pub type ConsumerChainId = String;
@@ -63,4 +64,24 @@ pub struct ValidatorDetail {
     pub status: ValidatorStatus,
     pub unstake_withdraw_certificate: Option<String>,
     pub is_destroyable: bool,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct StakingPoolInfo {
+    pub pool_id: AccountId,
+    #[serde(with = "u128_dec_format")]
+    pub total_share_balance: u128,
+    #[serde(with = "u128_dec_format")]
+    pub total_staked_balance: u128,
+    pub locked: bool,
+    #[serde(with = "u64_dec_format")]
+    pub unlock_epoch: u64,
+    #[serde(with = "u64_dec_format")]
+    pub last_unstake_epoch: u64,
+    pub last_unstake_batch_id: Option<String>,
+    #[serde(with = "u64_dec_format")]
+    pub current_unstake_batch_id: u64,
+    #[serde(with = "u128_dec_format")]
+    pub batched_unstake_amount: u128,
+    pub submitted_unstake_batches_count: u32,
 }
