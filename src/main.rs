@@ -5,6 +5,7 @@ use crate::schedules::anchor_actions::fetch_validator_set_from_restaking_base_an
 use crate::schedules::anchor_actions::process_pending_slash_in_anchor_ibc;
 use crate::schedules::canister_balance::check_canister_balance;
 use crate::schedules::near_account_balance::check_near_account_balance;
+use crate::schedules::unstake::handle_unstake_batch;
 use crate::schedules::unstake::process_unstake_for_validators;
 use anyhow::anyhow;
 use async_trait::async_trait;
@@ -68,6 +69,9 @@ async fn main() -> anyhow::Result<()> {
     });
 
     scheduler.every(12.hour()).run(|| async {
+        let result = handle_unstake_batch().await;
+        info!("handle_unstake_batch result: {:?}", result);
+
         let result = process_unstake_for_validators().await;
         info!("process_unstake_for_validators result: {:?}", result);
     });

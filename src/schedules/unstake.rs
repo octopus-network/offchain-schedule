@@ -5,6 +5,45 @@ use crate::{
     *,
 };
 
+pub async fn handle_unstake_batch() -> anyhow::Result<()> {
+    info!("handle_unstake_batch");
+
+    let restaking_base = RESTAKING_BASE
+        .get()
+        .ok_or_else(|| anyhow!("Failed to get LPOS_MARKET."))?;
+
+    let signer = SIGNER
+        .get()
+        .ok_or_else(|| anyhow!("Failed to get SIGNER."))?;
+
+    let staking_pools = restaking_base.get_staking_pools(signer).await?;
+    let current_epoch_height = restaking_base.get_current_epoch_height(signer).await?;
+
+    for staking_pool_info in staking_pools {
+        if staking_pool_info.last_unstake_batch_id.is_some()
+            && staking_pool_info.last_unstake_epoch + 4 <= current_epoch_height
+        {
+            restaking_base
+                .withdraw_unstake_batch(
+                    signer,
+                    staking_pool_info.pool_id.clone(),
+                    staking_pool_info.last_unstake_batch_id.unwrap(),
+                )
+                .await?
+                .into_result()?;
+        }
+
+        if staking_pool_info.batched_unstake_amount > 0 {
+            restaking_base
+                .submit_unstake_batch(signer, staking_pool_info.pool_id.clone())
+                .await?
+                .into_result()?;
+        }
+    }
+
+    Ok(())
+}
+
 pub async fn process_unstake_for_validators() -> anyhow::Result<()> {
     info!("process_unstake_for_validators");
 
