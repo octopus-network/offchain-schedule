@@ -1,4 +1,5 @@
 use dotenv::dotenv;
+use itertools::Itertools;
 use std::env;
 
 use anyhow::{anyhow, Ok};
@@ -26,6 +27,10 @@ pub static LPOS_MARKET: OnceCell<LposMarket> = OnceCell::const_new();
 pub static RESTAKING_BASE: OnceCell<RestakingBase> = OnceCell::const_new();
 pub static APPCHAIN_REGISTRY_CONTRACT: OnceCell<AppchainRegistryContract> = OnceCell::const_new();
 pub static SYS_ENV: OnceCell<SystemEnv> = OnceCell::const_new();
+
+// staker list that contain un-batched pending withdrawals
+pub static STAKER_LIST_CONTAIN_UNBATCHED_PENDING_WITHDRAWAL: OnceCell<Vec<AccountId>> =
+    OnceCell::const_new();
 
 #[derive(Debug)]
 pub struct SystemEnv {
@@ -111,6 +116,19 @@ pub async fn init_env_config() -> anyhow::Result<()> {
                 NEAR_MAINNET_WORKER.get().unwrap(),
             );
             SIGNER.set(signer)?;
+
+            STAKER_LIST_CONTAIN_UNBATCHED_PENDING_WITHDRAWAL.set(
+                vec![
+                    "1.v1.lpos-market.near",
+                    "3.v1.lpos-market.near",
+                    "4.v1.lpos-market.near",
+                    "8.v1.lpos-market.near",
+                    "9.v1.lpos-market.near",
+                ]
+                .iter()
+                .map(|e| e.parse().unwrap())
+                .collect_vec(),
+            )?;
         }
         NearNetwork::Testnet => {
             let worker = near_workspaces::testnet()
@@ -128,6 +146,7 @@ pub async fn init_env_config() -> anyhow::Result<()> {
                 NEAR_TESTNET_WORKER.get().unwrap(),
             );
             SIGNER.set(signer)?;
+            STAKER_LIST_CONTAIN_UNBATCHED_PENDING_WITHDRAWAL.set(vec![])?;
         }
     }
 

@@ -85,3 +85,37 @@ pub struct StakingPoolInfo {
     pub batched_unstake_amount: u128,
     pub submitted_unstake_batches_count: u32,
 }
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct StakingPoolDetail {
+    pub pool_id: AccountId,
+    #[serde(with = "u128_dec_format")]
+    pub total_share_balance: u128,
+    #[serde(with = "u128_dec_format")]
+    pub total_staked_balance: u128,
+    pub stakers: Vec<AccountId>,
+    pub locked: bool,
+    // pub unlock_epoch: u64,
+    // #[serde(with = "u64_dec_format")]
+    // pub last_unstake_epoch: u64,
+    pub last_unstake_batch_id: Option<String>,
+    pub current_unstake_batch_id: String,
+    #[serde(with = "u128_dec_format")]
+    pub batched_unstake_amount: u128,
+    // pub submitted_unstake_batches: Vec<SubmittedUnstakeBatch>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct PendingWithdrawal {
+    pub withdrawal_certificate: String,
+    pub pool_id: AccountId,
+    #[serde(with = "u128_dec_format")]
+    pub amount: u128,
+    #[serde(with = "u64_dec_format")]
+    pub unlock_epoch: u64,
+    #[serde(with = "u64_dec_format")]
+    pub unlock_time: u64,
+    pub beneficiary: AccountId,
+    pub allow_other_withdraw: bool,
+    pub unstake_batch_id: Option<String>,
+}
