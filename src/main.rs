@@ -58,7 +58,7 @@ async fn main() -> anyhow::Result<()> {
         info!("fetch_validator_set_from_restaking_base_and_send_vsc_packet_to_appchain_in_anchors result: {:?}", result);
     });
 
-    scheduler.every(1.day()).run(|| async {
+    scheduler.every(5.minute()).run(|| async {
         let result = ping_every_validators().await;
         info!("ping every validators result: {:?}", result);
     });
