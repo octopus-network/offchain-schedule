@@ -42,6 +42,8 @@ pub struct ValidatorInfo {
     pub unstake_withdraw_certificate: Option<String>,
     pub is_destroyable: bool,
     pub undistributed_reward_count: u32,
+    #[serde(with = "u64_dec_format")]
+    pub last_ping_epoch: u64,
 }
 
 #[derive(Serialize, Deserialize)]
