@@ -5,6 +5,8 @@ use crate::schedules::anchor_actions::fetch_validator_set_from_restaking_base_an
 use crate::schedules::anchor_actions::process_pending_slash_in_anchor_ibc;
 use crate::schedules::canister_balance::check_canister_balance;
 use crate::schedules::near_account_balance::check_near_account_balance;
+use crate::schedules::near_account_balance::check_near_account_ft_balance;
+use crate::schedules::near_account_storage::check_near_account_storage;
 use crate::schedules::unstake::handle_unstake_batch;
 use crate::schedules::unstake::process_unstake_for_validators;
 use anyhow::anyhow;
@@ -19,6 +21,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use tracing::info;
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter, Registry};
+use util::*;
 
 mod cmd_args;
 mod global;
@@ -45,8 +48,15 @@ async fn main() -> anyhow::Result<()> {
         let result = check_near_account_balance().await;
         info!("check_near_account_balance result: {:?}", result);
 
+        let result = check_near_account_storage().await;
+        info!("check_near_account_storage result: {:?}", result);
+
+        let result = check_near_account_ft_balance().await;
+        info!("check_near_account_ft_balance result: {:?}", result);
+
         let result = distribute_pending_rewards_in_anchor_ibc().await;
-        info!("distribute_lpos_market_reward result: {:?}", result);
+        info!("distribute_pending_rewards_in_anchor_ibc result: {:?}", result);
+
         let result = distribute_lpos_market_reward().await;
         info!("distribute_lpos_market_reward result: {:?}", result);
     });
