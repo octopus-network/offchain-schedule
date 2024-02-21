@@ -1,5 +1,30 @@
+use near_workspaces::types::AccountDetails;
+
 use crate::cmd_args::NearNetwork;
+use crate::*;
 use std::path::PathBuf;
+
+pub async fn get_account_details_by_sys_env(
+    account_id: &AccountId,
+) -> anyhow::Result<AccountDetails> {
+    let sys_env = SYS_ENV.get().unwrap();
+    match sys_env.near_env {
+        NearNetwork::Mainnet => {
+            let worker = NEAR_MAINNET_WORKER.get().unwrap();
+            worker
+                .view_account(account_id)
+                .await
+                .map_err(|e| anyhow!("Failed to get account detail, {}", e))
+        }
+        NearNetwork::Testnet => {
+            let worker = NEAR_TESTNET_WORKER.get().unwrap();
+            worker
+                .view_account(account_id)
+                .await
+                .map_err(|e| anyhow!("Failed to get account detail, {}", e))
+        }
+    }
+}
 
 #[allow(unused)]
 pub fn get_near_account_dir_path(account_id: &str, network: &NearNetwork) -> PathBuf {

@@ -45,6 +45,8 @@ pub struct SystemEnv {
     pub(crate) active_ibc_anchor_id_list: Vec<AccountId>,
     pub(crate) canister_info_list: Vec<CanisterInfo>,
     pub(crate) near_account_id_list: Vec<AccountId>,
+    pub(crate) near_account_ft_check_list: Vec<(AccountId, AccountId, String)>,
+    pub(crate) near_account_storage_check_list: Vec<(AccountId, u32)>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -96,6 +98,16 @@ pub async fn init_env_config() -> anyhow::Result<()> {
         near_account_id_list: serde_json::from_str(
             &env::var("NEAR_ACCOUNT_ID_LIST")
                 .map_err(|_| anyhow!("NEAR_ACCOUNT_ID_LIST environment variable not found"))?,
+        )?,
+        near_account_ft_check_list: serde_json::from_str(
+            &env::var("NEAR_ACCOUNT_FT_CHECK_LIST").map_err(|_| {
+                anyhow!("NEAR_ACCOUNT_FT_CHECK_LIST environment variable not found")
+            })?,
+        )?,
+        near_account_storage_check_list: serde_json::from_str(
+            &env::var("NEAR_ACCOUNT_STORAGE_CHECK_LIST").map_err(|_| {
+                anyhow!("NEAR_ACCOUNT_STORAGE_CHECK_LIST environment variable not found")
+            })?,
         )?,
     };
 
